@@ -20,7 +20,9 @@ app_license = "mit"
 # 		"has_permission": "luxury_customization.api.permission.has_app_permission"
 # 	}
 # ]
-
+after_migrate = ["luxury_customization.customizations.employee.create_custom_fields", "luxury_customization.customizations.company.create_custom_fields"]
+after_uninstall = ["luxury_customization.customizations.employee.delete_custom_fields", "luxury_customization.customizations.company.delete_custom_fields"]
+after_install = ["luxury_customization.customizations.employee.create_custom_fields", "luxury_customization.customizations.company.create_custom_fields"]
 # Includes in <head>
 # ------------------
 
