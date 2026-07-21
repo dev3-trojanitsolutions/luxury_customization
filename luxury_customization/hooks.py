@@ -20,7 +20,7 @@ app_license = "mit"
 # 		"has_permission": "luxury_customization.api.permission.has_app_permission"
 # 	}
 # ]
-after_migrate = ["luxury_customization.customizations.employee.create_custom_fields", "luxury_customization.customizations.company.create_custom_fields"]
+after_migrate = ["luxury_customization.customizations.employee.create_custom_fields", "luxury_customization.customizations.company.create_custom_fields", "luxury_customization.customizations.company.cleanup_company_document_fields"]
 after_uninstall = ["luxury_customization.customizations.employee.delete_custom_fields", "luxury_customization.customizations.company.delete_custom_fields"]
 after_install = ["luxury_customization.customizations.employee.create_custom_fields", "luxury_customization.customizations.company.create_custom_fields"]
 # Includes in <head>
@@ -45,7 +45,7 @@ after_install = ["luxury_customization.customizations.employee.create_custom_fie
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {"Company": "public/js/company.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -151,23 +151,11 @@ after_install = ["luxury_customization.customizations.employee.create_custom_fie
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"luxury_customization.tasks.all"
-# 	],
-# 	"daily": [
-# 		"luxury_customization.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"luxury_customization.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"luxury_customization.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"luxury_customization.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	"daily": [
+		"luxury_customization.tasks.send_company_document_expiry_notifications"
+	],
+}
 
 # Testing
 # -------
