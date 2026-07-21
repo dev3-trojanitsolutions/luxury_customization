@@ -11,7 +11,8 @@
   "document_name",
   "document_attachment",
   "issue_date",
-  "expiry_date"
+  "expiry_date",
+  "status"
  ],
  "fields": [
   {
@@ -41,12 +42,18 @@
    "hidden": 1,
    "label": "Company",
    "options": "Company"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nActive\nExpired"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-07-21 12:55:52.004704",
+ "modified": "2026-07-21 16:20:15.478452",
  "modified_by": "Administrator",
  "module": "luxury_customization",
  "name": "Company Documents",
