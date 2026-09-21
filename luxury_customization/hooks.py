@@ -20,9 +20,9 @@ app_license = "mit"
 # 		"has_permission": "luxury_customization.api.permission.has_app_permission"
 # 	}
 # ]
-after_migrate = ["luxury_customization.customizations.employee.create_custom_fields", "luxury_customization.customizations.company.create_custom_fields"]
-after_uninstall = ["luxury_customization.customizations.employee.delete_custom_fields", "luxury_customization.customizations.company.delete_custom_fields"]
-after_install = ["luxury_customization.customizations.employee.create_custom_fields", "luxury_customization.customizations.company.create_custom_fields"]
+after_migrate = ["luxury_customization.customizations.employee.create_custom_fields", "luxury_customization.customizations.company.create_custom_fields","luxury_customization.customizations.employee_checkin.create_custom_fields"]
+after_uninstall = ["luxury_customization.customizations.employee.delete_custom_fields", "luxury_customization.customizations.company.delete_custom_fields","luxury_customization.customizations.employee_checkin.delete_custom_fields"]
+after_install = ["luxury_customization.customizations.employee.create_custom_fields", "luxury_customization.customizations.company.create_custom_fields","luxury_customization.customizations.employee_checkin.create_custom_fields"]
 # Includes in <head>
 # ------------------
 
@@ -140,13 +140,11 @@ doctype_js = {"Company": "public/js/company.js"}
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"Employee Checkin": {
+		"before_insert": "luxury_customization.customizations.employee_checkin.set_check_in_time"
+	}
+}
 
 # Scheduled Tasks
 # ---------------
