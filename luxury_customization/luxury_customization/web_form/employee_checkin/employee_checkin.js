@@ -1,6 +1,81 @@
 frappe.ready(function () {
 	frappe.web_form.set_value("time", frappe.datetime.now_datetime());
 
+	// Cache for employee names
+	window._employeeCache = {};
+
+	// Custom dropdown formatting for Employee field
+	setTimeout(() => {
+		const employeeInput = document.querySelector('[data-fieldname="employee"] input');
+		if (employeeInput) {
+			// Watch for dropdown changes
+			const dropdownParent = employeeInput.parentElement;
+			const observer = new MutationObserver(() => {
+				const dropdown = dropdownParent.querySelector('ul');
+				if (dropdown) {
+					updateDropdownItems(dropdown);
+				}
+			});
+
+			observer.observe(dropdownParent, { childList: true, subtree: true });
+
+			// Also listen to input events
+			employeeInput.addEventListener('input', () => {
+				setTimeout(() => {
+					const dropdown = dropdownParent.querySelector('ul');
+					if (dropdown) {
+						updateDropdownItems(dropdown);
+					}
+				}, 100);
+			});
+		}
+	}, 200);
+
+	function updateDropdownItems(dropdown) {
+		const items = dropdown.querySelectorAll('li');
+		const needsFetch = [];
+
+		items.forEach(item => {
+			const empCode = item.textContent.trim();
+			if (empCode && !window._employeeCache[empCode]) {
+				needsFetch.push(empCode);
+			}
+		});
+
+		if (needsFetch.length > 0) {
+			frappe.call({
+				method: "frappe.client.get_list",
+				args: {
+					doctype: "Employee",
+					filters: { name: ["in", needsFetch] },
+					fields: ["name", "employee_name"],
+					limit_page_length: 100
+				},
+				callback: (r) => {
+					if (r.message) {
+						r.message.forEach(emp => {
+							window._employeeCache[emp.name] = emp.employee_name;
+						});
+						renderDropdown(dropdown);
+					}
+				}
+			});
+		} else {
+			renderDropdown(dropdown);
+		}
+	}
+
+	function renderDropdown(dropdown) {
+		const items = dropdown.querySelectorAll('li');
+		items.forEach(item => {
+			const empCode = item.textContent.trim();
+			const empName = window._employeeCache[empCode] || '';
+			if (empName) {
+				item.innerHTML = `<strong>${empCode}</strong><br/><span style="font-size: 0.85em; color: #666;">${empName}</span>`;
+			}
+		});
+	}
+
 	frappe.web_form.on("employee", (field, value) => {
 		if (!value) {
 			frappe.web_form.set_value("employee_name", "");
