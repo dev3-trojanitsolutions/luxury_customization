@@ -1,6 +1,10 @@
 frappe.ready(function () {
 	frappe.web_form.set_value("time", frappe.datetime.now_datetime());
 
+	frappe.web_form.fields_dict.employee.get_query = () => ({
+		query: "luxury_customization.api.employee_checkin.employee_query",
+	});
+
 	frappe.web_form.on("employee", (field, value) => {
 		if (!value) {
 			frappe.web_form.set_value("employee_name", "");
