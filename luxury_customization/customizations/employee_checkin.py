@@ -5,6 +5,14 @@ def create_custom_fields():
     custom_fields = {
         "Employee Checkin": [
             {
+                "fieldname": "employee_code",
+                "fieldtype": "Data",
+                "label": "Employee Code",
+                "insert_after": "employee",
+                "read_only": 1,
+                "reqd": 0
+            },
+            {
                 "fieldname": "employee_image",
                 "fieldtype": "Attach Image",
                 "label": "Employee Image",
@@ -26,7 +34,7 @@ def set_check_in_time(doc, method):
 	doc.time = frappe.utils.now_datetime()
 
 def delete_custom_fields():
-    custom_fields_to_delete = { "Employee Checkin": ["employee_image"] }
+    custom_fields_to_delete = { "Employee Checkin": ["employee_code", "employee_image"] }
 
     for doctype, fields in custom_fields_to_delete.items():
         for field_name in fields:

@@ -21,7 +21,7 @@
  "list_columns": [],
  "login_required": 0,
  "max_attachment_size": 0,
- "modified": "2026-09-21 19:37:38.148631",
+ "modified": "2026-09-22 13:05:16.839565",
  "modified_by": "Administrator",
  "module": "luxury_customization",
  "name": "employee-checkin",
@@ -36,19 +36,6 @@
  "web_form_fields": [
   {
    "allow_read_on_all_link_options": 0,
-   "fieldname": "employee_image",
-   "fieldtype": "Attach Image",
-   "hidden": 0,
-   "label": "Employee Image",
-   "max_length": 0,
-   "max_value": 0,
-   "precision": "",
-   "read_only": 0,
-   "reqd": 0,
-   "show_in_filter": 0
-  },
-  {
-   "allow_read_on_all_link_options": 0,
    "fieldname": "employee",
    "fieldtype": "Link",
    "hidden": 0,
@@ -59,6 +46,19 @@
    "precision": "",
    "read_only": 0,
    "reqd": 1,
+   "show_in_filter": 0
+  },
+  {
+   "allow_read_on_all_link_options": 0,
+   "fieldname": "employee_code",
+   "fieldtype": "Data",
+   "hidden": 0,
+   "label": "Employee Code",
+   "max_length": 0,
+   "max_value": 0,
+   "precision": "",
+   "read_only": 1,
+   "reqd": 0,
    "show_in_filter": 0
   },
   {
@@ -76,6 +76,19 @@
   },
   {
    "allow_read_on_all_link_options": 0,
+   "fieldname": "employee_image",
+   "fieldtype": "Attach Image",
+   "hidden": 0,
+   "label": "Employee Image",
+   "max_length": 0,
+   "max_value": 0,
+   "precision": "",
+   "read_only": 0,
+   "reqd": 0,
+   "show_in_filter": 0
+  },
+  {
+   "allow_read_on_all_link_options": 0,
    "fieldname": "log_type",
    "fieldtype": "Select",
    "hidden": 0,
@@ -85,20 +98,6 @@
    "options": "\nIN\nOUT",
    "precision": "",
    "read_only": 0,
-   "reqd": 0,
-   "show_in_filter": 0
-  },
-  {
-   "allow_read_on_all_link_options": 0,
-   "fieldname": "shift",
-   "fieldtype": "Link",
-   "hidden": 0,
-   "label": "Shift",
-   "max_length": 0,
-   "max_value": 0,
-   "options": "Shift Type",
-   "precision": "",
-   "read_only": 1,
    "reqd": 0,
    "show_in_filter": 0
   },
@@ -127,42 +126,6 @@
    "read_only": 1,
    "read_only_depends_on": "",
    "reqd": 1,
-   "show_in_filter": 0
-  },
-  {
-   "allow_read_on_all_link_options": 0,
-   "fieldname": "column_break_yqpi",
-   "fieldtype": "Column Break",
-   "hidden": 0,
-   "max_length": 0,
-   "max_value": 0,
-   "precision": "",
-   "read_only": 0,
-   "reqd": 0,
-   "show_in_filter": 0
-  },
-  {
-   "allow_read_on_all_link_options": 0,
-   "fieldname": "section_break_ksbo",
-   "fieldtype": "Section Break",
-   "hidden": 0,
-   "max_length": 0,
-   "max_value": 0,
-   "precision": "",
-   "read_only": 0,
-   "reqd": 0,
-   "show_in_filter": 0
-  },
-  {
-   "allow_read_on_all_link_options": 0,
-   "fieldname": "column_break_vyyt",
-   "fieldtype": "Column Break",
-   "hidden": 0,
-   "max_length": 0,
-   "max_value": 0,
-   "precision": "",
-   "read_only": 0,
-   "reqd": 0,
    "show_in_filter": 0
   }
  ]

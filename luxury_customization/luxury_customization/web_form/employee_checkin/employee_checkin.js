@@ -4,13 +4,15 @@ frappe.ready(function () {
 	frappe.web_form.on("employee", (field, value) => {
 		if (!value) {
 			frappe.web_form.set_value("employee_name", "");
+			frappe.web_form.set_value("employee_code", "");
 			return;
 		}
 		frappe.call({
-			method: "luxury_customization.api.employee_checkin.get_employee_name",
+			method: "luxury_customization.api.employee_checkin.get_employee_details",
 			args: { employee: value },
 			callback: (r) => {
-				frappe.web_form.set_value("employee_name", r.message || "");
+				frappe.web_form.set_value("employee_name", r.message?.employee_name || "");
+				frappe.web_form.set_value("employee_code", r.message?.employee_number || "");
 			},
 		});
 	});
@@ -19,6 +21,9 @@ frappe.ready(function () {
 	setTimeout(() => {
 		const imageField = document.querySelector('[data-fieldname="employee_image"]');
 		if (imageField && !imageField.querySelector('.camera-capture-btn')) {
+			// Remove native "Attach" button — Take Photo is the only way to set employee_image
+			const attachBtn = imageField.querySelector('.btn-attach');
+			if (attachBtn) attachBtn.remove();
 			// Create hidden file input with camera capture
 			const cameraInput = document.createElement('input');
 			cameraInput.type = 'file';
