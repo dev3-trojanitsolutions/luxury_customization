@@ -44,18 +44,11 @@ frappe.ready(function () {
 
 		if (needsFetch.length > 0) {
 			frappe.call({
-				method: "frappe.client.get_list",
-				args: {
-					doctype: "Employee",
-					filters: { name: ["in", needsFetch] },
-					fields: ["name", "employee_name"],
-					limit_page_length: 100
-				},
+				method: "luxury_customization.api.employee_checkin.get_employees_bulk",
+				args: { employee_codes: needsFetch },
 				callback: (r) => {
 					if (r.message) {
-						r.message.forEach(emp => {
-							window._employeeCache[emp.name] = emp.employee_name;
-						});
+						Object.assign(window._employeeCache, r.message);
 						renderDropdown(dropdown);
 					}
 				}
@@ -83,11 +76,13 @@ frappe.ready(function () {
 			return;
 		}
 		frappe.call({
-			method: "luxury_customization.api.employee_checkin.get_employee_details",
+			method: "luxury_customization.api.employee_checkin.get_employee_info",
 			args: { employee: value },
 			callback: (r) => {
-				frappe.web_form.set_value("employee_name", r.message?.employee_name || "");
-				frappe.web_form.set_value("employee_code", r.message?.employee_number || "");
+				if (r.message) {
+					frappe.web_form.set_value("employee_name", r.message.employee_name || "");
+					frappe.web_form.set_value("employee_code", r.message.employee_code || "");
+				}
 			},
 		});
 	});
