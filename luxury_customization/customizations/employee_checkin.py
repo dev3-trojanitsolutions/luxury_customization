@@ -33,6 +33,30 @@ def create_custom_fields():
 def set_check_in_time(doc, method):
 	doc.time = frappe.utils.now_datetime()
 
+@frappe.whitelist(methods=["POST", "PUT"], allow_guest=True)
+def accept(web_form: str, data, web_form_request_key: str | None = None):
+    # Guest submissions to employee-checkin fail to save the Attach Image
+    # field: web_form.accept() saves the File without ignore_permissions,
+    # and File.has_permission (frappe core) then requires *write* on the
+    # just-inserted Employee Checkin, which Guest never has. Elevating only
+    # for this one form, only for Guest, for the duration of the original
+    # handler mirrors dms.api.sales._submit_as_admin.
+    from frappe.website.doctype.web_form.web_form import accept as _accept
+
+    if web_form != "employee-checkin" or frappe.session.user != "Guest":
+        return _accept(web_form=web_form, data=data, web_form_request_key=web_form_request_key)
+
+    _user = frappe.session.user
+    frappe.session.user = "Administrator"
+    frappe.local.role_permissions = {}
+    frappe.local.user_perms = None
+    try:
+        return _accept(web_form=web_form, data=data, web_form_request_key=web_form_request_key)
+    finally:
+        frappe.session.user = _user
+        frappe.local.role_permissions = {}
+        frappe.local.user_perms = None
+
 def delete_custom_fields():
     custom_fields_to_delete = { "Employee Checkin": ["employee_code", "employee_image"] }
 

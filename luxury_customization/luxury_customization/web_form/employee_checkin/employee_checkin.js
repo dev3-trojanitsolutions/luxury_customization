@@ -1,75 +1,7 @@
 frappe.ready(function () {
 	frappe.web_form.set_value("time", frappe.datetime.now_datetime());
 
-	// Cache for employee names
-	window._employeeCache = {};
-
-	// Custom dropdown formatting for Employee field
-	setTimeout(() => {
-		const employeeInput = document.querySelector('[data-fieldname="employee"] input');
-		if (employeeInput) {
-			// Watch for dropdown changes
-			const dropdownParent = employeeInput.parentElement;
-			const observer = new MutationObserver(() => {
-				const dropdown = dropdownParent.querySelector('ul');
-				if (dropdown) {
-					updateDropdownItems(dropdown);
-				}
-			});
-
-			observer.observe(dropdownParent, { childList: true, subtree: true });
-
-			// Also listen to input events
-			employeeInput.addEventListener('input', () => {
-				setTimeout(() => {
-					const dropdown = dropdownParent.querySelector('ul');
-					if (dropdown) {
-						updateDropdownItems(dropdown);
-					}
-				}, 100);
-			});
-		}
-	}, 200);
-
-	function updateDropdownItems(dropdown) {
-		const items = dropdown.querySelectorAll('li');
-		const needsFetch = [];
-
-		items.forEach(item => {
-			const empCode = item.textContent.trim();
-			if (empCode && !window._employeeCache[empCode]) {
-				needsFetch.push(empCode);
-			}
-		});
-
-		if (needsFetch.length > 0) {
-			frappe.call({
-				method: "luxury_customization.api.employee_checkin.get_employees_bulk",
-				args: { employee_codes: needsFetch },
-				callback: (r) => {
-					if (r.message) {
-						Object.assign(window._employeeCache, r.message);
-						renderDropdown(dropdown);
-					}
-				}
-			});
-		} else {
-			renderDropdown(dropdown);
-		}
-	}
-
-	function renderDropdown(dropdown) {
-		const items = dropdown.querySelectorAll('li');
-		items.forEach(item => {
-			const empCode = item.textContent.trim();
-			const empName = window._employeeCache[empCode] || '';
-			if (empName) {
-				item.innerHTML = `<strong>${empCode}</strong><br/><span style="font-size: 0.85em; color: #666;">${empName}</span>`;
-			}
-		});
-	}
-
-	frappe.web_form.on("employee", (field, value) => {
+	function fetchAndSetEmployeeInfo(value) {
 		if (!value) {
 			frappe.web_form.set_value("employee_name", "");
 			frappe.web_form.set_value("employee_code", "");
@@ -85,6 +17,10 @@ frappe.ready(function () {
 				}
 			},
 		});
+	}
+
+	frappe.web_form.on("employee", (field, value) => {
+		fetchAndSetEmployeeInfo(value);
 	});
 
 	// Add camera capture for employee_image field
