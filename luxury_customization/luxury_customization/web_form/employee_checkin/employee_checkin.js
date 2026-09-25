@@ -56,7 +56,12 @@ frappe.ready(function () {
 				if (file) {
 					const reader = new FileReader();
 					reader.onload = (event) => {
-						frappe.web_form.set_value('employee_image', event.target.result);
+						// web_form.accept() (frappe core) expects Attach values as
+						// "<filename>,<data-url>" — it splits on the first comma to
+						// recover the file name, then decodes the data URL itself.
+						// Sending the bare data URL makes "data:image/...;base64" the
+						// file name instead of the payload prefix.
+						frappe.web_form.set_value('employee_image', `${file.name},${event.target.result}`);
 						frappe.msgprint('Photo captured successfully');
 					};
 					reader.readAsDataURL(file);

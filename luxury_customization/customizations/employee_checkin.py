@@ -33,6 +33,38 @@ def create_custom_fields():
 def set_check_in_time(doc, method):
 	doc.time = frappe.utils.now_datetime()
 
+def link_employee_checkin_image_field(doc, method):
+	# web_form.accept() (frappe core) creates the employee_image File with
+	# attached_to_doctype/attached_to_name set but leaves attached_to_field
+	# blank. Core's own on_update hook (attach_files_to_document) then can't
+	# recognize this File as "already attached" (it only reuses a File whose
+	# attached_to_* are ALL blank) and creates a second, fully-linked File for
+	# the same upload. Filling attached_to_field here, before that check runs,
+	# makes the first File already match so no duplicate gets created.
+	if doc.attached_to_doctype == "Employee Checkin" and doc.attached_to_name and not doc.attached_to_field:
+		doc.attached_to_field = "employee_image"
+
+def make_employee_image_public(doc, method):
+	# Single choke point: catches private employee_image files regardless of
+	# how they were uploaded (web form camera capture, Desk attach dialog, API).
+	if not doc.employee_image:
+		return
+
+	private_files = frappe.get_all(
+		"File",
+		filters={
+			"attached_to_doctype": doc.doctype,
+			"attached_to_name": doc.name,
+			"attached_to_field": "employee_image",
+			"is_private": 1,
+		},
+		pluck="name",
+	)
+	for file_name in private_files:
+		file_doc = frappe.get_doc("File", file_name)
+		file_doc.is_private = 0
+		file_doc.save(ignore_permissions=True)
+
 @frappe.whitelist(methods=["POST", "PUT"], allow_guest=True)
 def accept(web_form: str, data, web_form_request_key: str | None = None):
     # Guest submissions to employee-checkin fail to save the Attach Image

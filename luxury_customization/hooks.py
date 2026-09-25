@@ -142,7 +142,11 @@ doctype_js = {"Company": "public/js/company.js"}
 
 doc_events = {
 	"Employee Checkin": {
-		"before_insert": "luxury_customization.customizations.employee_checkin.set_check_in_time"
+		"before_insert": "luxury_customization.customizations.employee_checkin.set_check_in_time",
+		"on_update": "luxury_customization.customizations.employee_checkin.make_employee_image_public"
+	},
+	"File": {
+		"before_insert": "luxury_customization.customizations.employee_checkin.link_employee_checkin_image_field"
 	}
 }
 
