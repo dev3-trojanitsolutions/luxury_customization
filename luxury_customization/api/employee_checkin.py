@@ -22,3 +22,10 @@ def get_employee_info(employee):
 	return {}
 
 
+
+@frappe.whitelist()
+def get_my_employee():
+	# Standard link: Employee.user_id -> User. Active record preferred.
+	return frappe.db.get_value(
+		"Employee", {"user_id": frappe.session.user}, "name", order_by="status asc, creation asc"
+	)

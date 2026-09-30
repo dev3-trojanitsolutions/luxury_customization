@@ -23,6 +23,21 @@ frappe.ready(function () {
 		fetchAndSetEmployeeInfo(value);
 	});
 
+	if (frappe.session.user !== "Guest") {
+		frappe.call({
+			method: "luxury_customization.api.employee_checkin.get_my_employee",
+			callback: (r) => {
+				if (!r.message) {
+					frappe.msgprint(__("No Employee record is linked to your user account."));
+					$(".web-form-footer .btn-primary, .web-form-actions .btn-primary").prop("disabled", true);
+					return;
+				}
+				frappe.web_form.set_value("employee", r.message);
+				frappe.web_form.set_df_property("employee", "read_only", 1);
+			},
+		});
+	}
+
 	// Add camera capture for employee_image field
 	setTimeout(() => {
 		const imageField = document.querySelector('[data-fieldname="employee_image"]');

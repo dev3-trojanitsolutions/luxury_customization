@@ -10,7 +10,11 @@ def get_context(context):
 	if not employee_field:
 		return
 
-	employees = frappe.get_all("Employee", fields=["name", "employee_name"])
+	filters = {}
+	if frappe.session.user != "Guest":
+		# Logged-in users only ever see their own Employee record.
+		filters["user_id"] = frappe.session.user
+	employees = frappe.get_all("Employee", filters=filters, fields=["name", "employee_name"])
 	employee_field.options = json.dumps(
 		[{"value": e.name, "label": e.name, "description": e.employee_name} for e in employees]
 	)

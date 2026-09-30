@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 
 def create_custom_fields():
@@ -74,6 +75,18 @@ def accept(web_form: str, data, web_form_request_key: str | None = None):
     # for this one form, only for Guest, for the duration of the original
     # handler mirrors dms.api.sales._submit_as_admin.
     from frappe.website.doctype.web_form.web_form import accept as _accept
+
+    if web_form == "employee-checkin" and frappe.session.user != "Guest":
+        # Logged-in users can only check in as their own Employee; enforce
+        # server-side so the read-only field can't be bypassed from the client.
+        from luxury_customization.api.employee_checkin import get_my_employee
+
+        employee = get_my_employee()
+        if not employee:
+            frappe.throw(_("No Employee record is linked to your user account."))
+        data = frappe.parse_json(data)
+        data["employee"] = employee
+        data = frappe.as_json(data)
 
     if web_form != "employee-checkin" or frappe.session.user != "Guest":
         return _accept(web_form=web_form, data=data, web_form_request_key=web_form_request_key)
