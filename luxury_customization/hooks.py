@@ -20,9 +20,9 @@ app_license = "mit"
 # 		"has_permission": "luxury_customization.api.permission.has_app_permission"
 # 	}
 # ]
-after_migrate = ["luxury_customization.customizations.employee.create_custom_fields", "luxury_customization.customizations.company.create_custom_fields","luxury_customization.customizations.employee_checkin.create_custom_fields"]
-after_uninstall = ["luxury_customization.customizations.employee.delete_custom_fields", "luxury_customization.customizations.company.delete_custom_fields","luxury_customization.customizations.employee_checkin.delete_custom_fields"]
-after_install = ["luxury_customization.customizations.employee.create_custom_fields", "luxury_customization.customizations.company.create_custom_fields","luxury_customization.customizations.employee_checkin.create_custom_fields"]
+after_migrate = ["luxury_customization.customizations.employee.create_custom_fields", "luxury_customization.customizations.company.create_custom_fields","luxury_customization.customizations.employee_checkin.create_custom_fields","luxury_customization.customizations.purchase_order.create_custom_fields","luxury_customization.customizations.purchase_receipt.create_custom_fields","luxury_customization.customizations.purchase_invoice.create_custom_fields","luxury_customization.customizations.supplier_quotation.create_custom_fields"]
+after_uninstall = ["luxury_customization.customizations.employee.delete_custom_fields", "luxury_customization.customizations.company.delete_custom_fields","luxury_customization.customizations.employee_checkin.delete_custom_fields","luxury_customization.customizations.purchase_order.delete_custom_fields","luxury_customization.customizations.purchase_receipt.delete_custom_fields","luxury_customization.customizations.purchase_invoice.delete_custom_fields","luxury_customization.customizations.supplier_quotation.delete_custom_fields"]
+after_install = ["luxury_customization.customizations.employee.create_custom_fields", "luxury_customization.customizations.company.create_custom_fields","luxury_customization.customizations.employee_checkin.create_custom_fields","luxury_customization.customizations.purchase_order.create_custom_fields","luxury_customization.customizations.purchase_receipt.create_custom_fields","luxury_customization.customizations.purchase_invoice.create_custom_fields","luxury_customization.customizations.supplier_quotation.create_custom_fields"]
 # Includes in <head>
 # ------------------
 
@@ -45,7 +45,13 @@ after_install = ["luxury_customization.customizations.employee.create_custom_fie
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-doctype_js = {"Company": "public/js/company.js"}
+doctype_js = {
+	"Company": "public/js/company.js",
+	"Purchase Order": "public/js/purchase_order.js",
+	"Purchase Receipt": "public/js/purchase_receipt.js",
+	"Purchase Invoice": "public/js/purchase_invoice.js",
+	"Supplier Quotation": "public/js/supplier_quotation.js",
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -141,6 +147,22 @@ doctype_js = {"Company": "public/js/company.js"}
 # Hook on document methods and events
 
 doc_events = {
+	"Purchase Order": {
+		"validate": "luxury_customization.customizations.purchase_order.validate",
+		"before_update_after_submit": "luxury_customization.customizations.purchase_order.validate"
+	},
+	"Purchase Receipt": {
+		"validate": "luxury_customization.customizations.purchase_receipt.validate",
+		"before_update_after_submit": "luxury_customization.customizations.purchase_receipt.validate"
+	},
+	"Purchase Invoice": {
+		"validate": "luxury_customization.customizations.purchase_invoice.validate",
+		"before_update_after_submit": "luxury_customization.customizations.purchase_invoice.validate"
+	},
+	"Supplier Quotation": {
+		"validate": "luxury_customization.customizations.supplier_quotation.validate",
+		"before_update_after_submit": "luxury_customization.customizations.supplier_quotation.validate"
+	},
 	"Employee Checkin": {
 		"before_insert": "luxury_customization.customizations.employee_checkin.set_check_in_time",
 		"on_update": "luxury_customization.customizations.employee_checkin.make_employee_image_public"
