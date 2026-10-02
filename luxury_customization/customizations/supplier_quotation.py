@@ -47,7 +47,7 @@ def create_custom_fields():
                 "insert_after": "calculation_currency",
                 "depends_on": "eval:doc.multi_currency_calculation",
                 "mandatory_depends_on": "eval:doc.multi_currency_calculation",
-                "description": "Calculation Currency per 1 unit of company currency",
+                "description": "Company currency per 1 unit of Calculation Currency",
             },
             {
                 "fieldname": "additional_currency_column",
@@ -124,4 +124,4 @@ def validate(doc, method=None):
         frappe.throw(_("Calculation Exchange Rate must be greater than zero"))
 
     for target, source in CONVERTED_TOTALS.items():
-        doc.set(target, flt(flt(doc.get(source)) * rate, doc.precision(target)))
+        doc.set(target, flt(flt(doc.get(source)) / rate, doc.precision(target)))

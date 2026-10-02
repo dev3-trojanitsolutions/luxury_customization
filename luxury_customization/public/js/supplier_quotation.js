@@ -9,7 +9,7 @@
 	function set_rate_label(frm) {
 		const company_currency = frm.doc.company ? erpnext.get_currency(frm.doc.company) : "";
 		const label = frm.doc.calculation_currency && company_currency
-			? __("Calculation Exchange Rate (1 {0} = ? {1})", [company_currency, frm.doc.calculation_currency])
+			? __("Calculation Exchange Rate (1 {0} = ? {1})", [frm.doc.calculation_currency, company_currency])
 			: __("Calculation Exchange Rate");
 		frm.set_df_property("calculation_exchange_rate", "label", label);
 	}
@@ -21,7 +21,7 @@
 		const enabled = frm.doc.multi_currency_calculation && frm.doc.calculation_currency && rate > 0;
 
 		Object.entries(CONVERTED_TOTALS).forEach(([target, source]) => {
-			const value = enabled ? flt(flt(frm.doc[source]) * rate, precision(target, frm.doc)) : 0;
+			const value = enabled ? flt(flt(frm.doc[source]) / rate, precision(target, frm.doc)) : 0;
 			if (flt(frm.doc[target]) !== value) frm.set_value(target, value);
 		});
 	}
