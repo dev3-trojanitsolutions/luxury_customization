@@ -68,10 +68,23 @@
 	function convert_row(frm, row) {
 		const rate = flt(frm.doc.calculation_exchange_rate);
 		if (!frm.doc.multi_currency_calculation || frm.doc.docstatus !== 0) return;
-		if (flt(row.other_currency_rate) <= 0 || rate <= 0) return;
+		if (flt(row.other_currency_rate) <= 0 || (rate <= 0 && !flt(frm.doc.calculation_to_document_rate))) return;
 
-		const value = flt(flt(row.other_currency_rate) * rate / (flt(frm.doc.conversion_rate) || 1), precision("price_list_rate", row));
+		const to_doc = flt(frm.doc.calculation_to_document_rate);
+		const price = to_doc ? flt(row.other_currency_rate) * to_doc : flt(row.other_currency_rate) * rate / (flt(frm.doc.conversion_rate) || 1);
+		const value = flt(price, precision("price_list_rate", row));
 		if (flt(row.price_list_rate) !== value) frappe.model.set_value(row.doctype, row.name, "price_list_rate", value);
+	}
+
+	// Live Calculation Currency -> document currency rate (editable afterwards; rows follow via convert_all_rows).
+	function fetch_document_rate(frm) {
+		const d = frm.doc;
+		if (d.docstatus !== 0 || !d.multi_currency_calculation || !d.calculation_currency || !d.currency) return;
+		frappe.call({
+			method: "erpnext.setup.utils.get_exchange_rate",
+			args: { from_currency: d.calculation_currency, to_currency: d.currency, transaction_date: d.posting_date },
+			callback: (r) => r.message && frm.set_value("calculation_to_document_rate", flt(r.message)),
+		});
 	}
 
 	function convert_all_rows(frm) {
@@ -79,9 +92,16 @@
 	}
 
 	frappe.ui.form.on("Purchase Invoice", {
-		multi_currency_calculation: convert_all_rows,
 		calculation_exchange_rate: convert_all_rows,
 		conversion_rate: convert_all_rows,
+		calculation_to_document_rate: convert_all_rows,
+		calculation_currency: fetch_document_rate,
+		currency: fetch_document_rate,
+		posting_date: fetch_document_rate,
+		multi_currency_calculation(frm) {
+			if (flt(frm.doc.calculation_to_document_rate)) convert_all_rows(frm);
+			else fetch_document_rate(frm);
+		},
 	});
 
 	frappe.ui.form.on("Purchase Invoice Item", {

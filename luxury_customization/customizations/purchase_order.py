@@ -1,6 +1,7 @@
 import frappe
 from frappe import _
 from frappe.custom.doctype.custom_field.custom_field import create_custom_field
+from erpnext.setup.utils import get_exchange_rate
 from frappe.utils import flt
 
 # Display-only: reads the standard base_* (company currency) totals and never writes to them.
@@ -9,12 +10,22 @@ CONVERTED_TOTALS = {
     "additional_total": "base_total",
     "additional_grand_total": "base_grand_total",
 }
-INPUT_FIELDS = ["multi_currency_calculation", "calculation_currency", "calculation_exchange_rate"]
+INPUT_FIELDS = ["multi_currency_calculation", "calculation_currency", "calculation_exchange_rate", "calculation_to_document_rate"]
 ITEM_SOURCES = [("supplier_quotation_item", "Supplier Quotation Item")]  # (item link field, source item doctype)
 
 def create_custom_fields():
     custom_fields = {
         "Purchase Order": [
+            {
+                "fieldname": "calculation_to_document_rate",
+                "fieldtype": "Float",
+                "label": "Calculation → Document Currency Rate",
+                "allow_on_submit": 1,
+                "precision": "9",
+                "insert_after": "buying_price_list",
+                "depends_on": "eval:doc.multi_currency_calculation && doc.calculation_currency",
+                "description": "Document currency per 1 unit of Calculation Currency",
+            },
             {
                 "fieldname": "additional_currency_section",
                 "fieldtype": "Section Break",
@@ -111,7 +122,7 @@ def delete_custom_fields():
     custom_fields_to_delete = {
         "Purchase Order": [
             "additional_currency_section", "multi_currency_calculation", "calculation_currency",
-            "calculation_exchange_rate", "additional_currency_column", "additional_net_total",
+            "calculation_exchange_rate", "calculation_to_document_rate", "additional_currency_column", "additional_net_total",
             "additional_total", "additional_grand_total",
         ],
         "Purchase Order Item": ["other_currency_rate"],
@@ -178,6 +189,13 @@ def copy_item_rates(doc):
                 row.other_currency_rate = frappe.db.get_value(source_doctype, row.get(field), "other_currency_rate") or 0
                 break
 
+def fetch_document_rate(doc):
+    # Live Calculation Currency -> document currency rate, stored so the user can still override it.
+    if not (doc.calculation_currency and doc.currency):
+        return 0
+    doc.calculation_to_document_rate = flt(get_exchange_rate(doc.calculation_currency, doc.currency, doc.get("transaction_date")))
+    return doc.calculation_to_document_rate
+
 def before_validate(doc, method=None):
     # Runs before ERPNext's own validate, so its normal Rate x Qty, tax and base_* logic takes over.
     copy_from_source(doc)
@@ -187,11 +205,16 @@ def before_validate(doc, method=None):
 
     rate = flt(doc.calculation_exchange_rate)
     conversion_rate = flt(doc.conversion_rate) or 1
+    to_document_rate = flt(doc.get("calculation_to_document_rate")) or fetch_document_rate(doc)
     for row in doc.items:
         if flt(row.get("other_currency_rate")) <= 0:
             continue
-        if rate <= 0:
-            frappe.throw(_("Calculation Exchange Rate must be greater than zero"))
-        # Rate is kept in document currency: other rate x (company currency per 1 calc currency) / conversion rate
-        row.price_list_rate = flt(flt(row.other_currency_rate) * rate / conversion_rate, row.precision("rate"))
+        if to_document_rate:
+            price = flt(row.other_currency_rate) * to_document_rate
+        else:
+            if rate <= 0:
+                frappe.throw(_("Calculation Exchange Rate must be greater than zero"))
+            # Fallback: other rate x (company currency per 1 calc currency) / conversion rate
+            price = flt(row.other_currency_rate) * rate / conversion_rate
+        row.price_list_rate = flt(price, row.precision("rate"))
         row.rate = row.price_list_rate
