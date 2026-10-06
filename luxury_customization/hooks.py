@@ -148,18 +148,22 @@ doctype_js = {
 
 doc_events = {
 	"Purchase Order": {
+		"before_validate": "luxury_customization.customizations.purchase_order.before_validate",
 		"validate": "luxury_customization.customizations.purchase_order.validate",
 		"before_update_after_submit": "luxury_customization.customizations.purchase_order.validate"
 	},
 	"Purchase Receipt": {
+		"before_validate": "luxury_customization.customizations.purchase_receipt.before_validate",
 		"validate": "luxury_customization.customizations.purchase_receipt.validate",
 		"before_update_after_submit": "luxury_customization.customizations.purchase_receipt.validate"
 	},
 	"Purchase Invoice": {
+		"before_validate": "luxury_customization.customizations.purchase_invoice.before_validate",
 		"validate": "luxury_customization.customizations.purchase_invoice.validate",
 		"before_update_after_submit": "luxury_customization.customizations.purchase_invoice.validate"
 	},
 	"Supplier Quotation": {
+		"before_validate": "luxury_customization.customizations.supplier_quotation.before_validate",
 		"validate": "luxury_customization.customizations.supplier_quotation.validate",
 		"before_update_after_submit": "luxury_customization.customizations.supplier_quotation.validate"
 	},
