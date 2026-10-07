@@ -44,6 +44,9 @@
 		});
 	}
 
+	// ERPNext rewrites base_* after every row change; coalesce so a bulk upload recalculates once.
+	const calculate_additional_currency_soon = frappe.utils.debounce(calculate_additional_currency, 300);
+
 	frappe.ui.form.on("Purchase Invoice", {
 		refresh(frm) {
 			set_rate_label(frm);
@@ -56,9 +59,9 @@
 		},
 		calculation_exchange_rate: calculate_additional_currency,
 		// ERPNext sets these whenever items, qty, rate, discount or taxes change
-		base_net_total: calculate_additional_currency,
-		base_total: calculate_additional_currency,
-		base_grand_total: calculate_additional_currency,
+		base_net_total: calculate_additional_currency_soon,
+		base_total: calculate_additional_currency_soon,
+		base_grand_total: calculate_additional_currency_soon,
 	});
 })();
 
@@ -91,6 +94,8 @@
 		(frm.doc.items || []).forEach((row) => convert_row(frm, row));
 	}
 
+	const convert_all_rows_soon = frappe.utils.debounce(convert_all_rows, 300);
+
 	frappe.ui.form.on("Purchase Invoice", {
 		calculation_exchange_rate: convert_all_rows,
 		conversion_rate: convert_all_rows,
@@ -106,7 +111,7 @@
 
 	frappe.ui.form.on("Purchase Invoice Item", {
 		other_currency_rate(frm, cdt, cdn) {
-			convert_row(frm, locals[cdt][cdn]);
+			convert_all_rows_soon(frm); // ponytail: one batched pass per upload, not one recalculation per row
 		},
 	});
 })();
