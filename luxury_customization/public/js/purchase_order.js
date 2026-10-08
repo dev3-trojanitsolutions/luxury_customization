@@ -70,13 +70,17 @@
 	// ERPNext's own handlers then work out Rate, Amount, taxes and totals.
 	function convert_row(frm, row) {
 		const rate = flt(frm.doc.calculation_exchange_rate);
-		if (!frm.doc.multi_currency_calculation || frm.doc.docstatus !== 0) return;
-		if (flt(row.other_currency_rate) <= 0 || (rate <= 0 && !flt(frm.doc.calculation_to_document_rate))) return;
+		if (!frm.doc.multi_currency_calculation || frm.doc.docstatus !== 0) return false;
+		if (flt(row.other_currency_rate) <= 0 || (rate <= 0 && !flt(frm.doc.calculation_to_document_rate))) return false;
 
 		const to_doc = flt(frm.doc.calculation_to_document_rate);
 		const price = to_doc ? flt(row.other_currency_rate) * to_doc : flt(row.other_currency_rate) * rate / (flt(frm.doc.conversion_rate) || 1);
 		const value = flt(price, precision("price_list_rate", row));
-		if (flt(row.price_list_rate) !== value) frappe.model.set_value(row.doctype, row.name, "price_list_rate", value);
+		if (flt(row.price_list_rate) === value && flt(row.rate) === value) return false;
+		// Assign directly (no per-row events); one recalculation runs after all rows.
+		row.price_list_rate = value;
+		row.rate = value;
+		return true;
 	}
 
 	// Live Calculation Currency -> document currency rate (editable afterwards; rows follow via convert_all_rows).
@@ -91,15 +95,18 @@
 	}
 
 	function convert_all_rows(frm) {
-		(frm.doc.items || []).forEach((row) => convert_row(frm, row));
+		const changed = (frm.doc.items || []).filter((row) => convert_row(frm, row)).length;
+		if (!changed) return;
+		frm.refresh_field("items");
+		frm.cscript.calculate_taxes_and_totals();
 	}
 
 	const convert_all_rows_soon = frappe.utils.debounce(convert_all_rows, 300);
 
 	frappe.ui.form.on("Purchase Order", {
-		calculation_exchange_rate: convert_all_rows,
-		conversion_rate: convert_all_rows,
-		calculation_to_document_rate: convert_all_rows,
+		calculation_exchange_rate: convert_all_rows_soon,
+		conversion_rate: convert_all_rows_soon,
+		calculation_to_document_rate: convert_all_rows_soon,
 		calculation_currency: fetch_document_rate,
 		currency: fetch_document_rate,
 		transaction_date: fetch_document_rate,
