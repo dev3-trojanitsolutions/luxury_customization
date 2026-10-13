@@ -26,6 +26,13 @@ def create_custom_fields():
                 "options": "Cheque Tracker Settings User",
                 "reqd": 0
             },
+            {
+                "fieldname": "cr_number",
+                "fieldtype":"Data",
+                "label": "CR Number",
+                "insert_after": "tax_id",
+                "reqd": 0
+            },
         ]
     }
 
@@ -37,7 +44,7 @@ def create_custom_fields():
                 frappe.clear_cache(doctype=doctype)
 
 def delete_custom_fields(): 
-    custom_fields_to_delete = { "Company": ["company_logos", "notify_days", "notify_userd"] }  
+    custom_fields_to_delete = { "Company": ["company_logos", "notify_days", "notify_userd", "cr_number"] }  
 
     for doctype, fields in custom_fields_to_delete.items(): 
         for field_name in fields: 
