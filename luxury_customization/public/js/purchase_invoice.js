@@ -9,8 +9,8 @@
 	function set_rate_label(frm) {
 		const company_currency = frm.doc.company ? erpnext.get_currency(frm.doc.company) : "";
 		const label = frm.doc.calculation_currency && company_currency
-			? __("Calculation Exchange Rate (1 {0} = ? {1})", [frm.doc.calculation_currency, company_currency])
-			: __("Calculation Exchange Rate");
+			? __("Buying Currency Exchange Rate (1 {0} = ? {1})", [frm.doc.calculation_currency, company_currency])
+			: __("Buying Currency Exchange Rate");
 		frm.set_df_property("calculation_exchange_rate", "label", label);
 	}
 
@@ -66,7 +66,7 @@
 })();
 
 (function () {
-	// Items table: Other Currency Rate x Calculation Exchange Rate / conversion rate -> standard Price List Rate.
+	// Items table: Other Currency Rate x Buying Currency Exchange Rate / conversion rate -> standard Price List Rate.
 	// ERPNext's own handlers then work out Rate, Amount, taxes and totals.
 	function convert_row(frm, row) {
 		const rate = flt(frm.doc.calculation_exchange_rate);
@@ -83,7 +83,7 @@
 		return true;
 	}
 
-	// Live Calculation Currency -> document currency rate (editable afterwards; rows follow via convert_all_rows).
+	// Live Buying Currency -> document currency rate (editable afterwards; rows follow via convert_all_rows).
 	function fetch_document_rate(frm) {
 		const d = frm.doc;
 		if (d.docstatus !== 0 || !d.multi_currency_calculation || !d.calculation_currency || !d.currency) return;

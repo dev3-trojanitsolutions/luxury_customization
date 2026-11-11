@@ -168,11 +168,11 @@ def validate(doc, method=None):
         return
 
     if not doc.calculation_currency:
-        frappe.throw(_("Please select a Calculation Currency"))
+        frappe.throw(_("Please select a Buying Currency"))
 
     rate = flt(doc.calculation_exchange_rate)
     if rate <= 0:
-        frappe.throw(_("Calculation Exchange Rate must be greater than zero"))
+        frappe.throw(_("Buying Currency Exchange Rate must be greater than zero"))
 
     for target, value in zip(CONVERTED_TOTALS, additional_totals(doc, rate)):
         doc.set(target, flt(value, doc.precision(target)))
@@ -213,7 +213,7 @@ def before_validate(doc, method=None):
             price = flt(row.other_currency_rate) * to_document_rate
         else:
             if rate <= 0:
-                frappe.throw(_("Calculation Exchange Rate must be greater than zero"))
+                frappe.throw(_("Buying Currency Exchange Rate must be greater than zero"))
             # Fallback: other rate x (company currency per 1 calc currency) / conversion rate
             price = flt(row.other_currency_rate) * rate / conversion_rate
         row.price_list_rate = flt(price, row.precision("rate"))

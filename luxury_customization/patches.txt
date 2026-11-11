@@ -6,3 +6,5 @@
 # Patches added in this section will be executed after doctypes are migrated
 luxury_customization.patches.add_buying_currency_section
 luxury_customization.patches.hide_additional_net_total
+luxury_customization.patches.rename_currency_labels
+luxury_customization.patches.hide_multi_currency_calculation
