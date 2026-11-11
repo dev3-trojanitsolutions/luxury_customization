@@ -55,5 +55,4 @@ jspm_packages/
 .aider*
 
 # Claude Code
-CLAUDE.md
 .claude/

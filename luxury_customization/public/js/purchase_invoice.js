@@ -124,14 +124,35 @@
 })();
 
 (function () {
-	// Ask once per opened draft whether to use multi currency calculation.
+	// Ask once per opened draft whether to use multi currency calculation; the user must tick consent first.
+	function ask_multi_currency(frm) {
+		const d = new frappe.ui.Dialog({
+			title: __("Multi Currency Calculation"),
+			fields: [
+				{ fieldtype: "HTML", options: `<p>${__("Do you want to use Multi Currency Calculation for this document?")}</p>` },
+				{ fieldname: "consent", fieldtype: "Check", label: __("I confirm my choice") },
+			],
+			primary_action_label: __("Yes"),
+			primary_action: () => answer(true),
+			secondary_action_label: __("No"),
+			secondary_action: () => answer(false),
+		});
+		function answer(use_it) {
+			if (!d.get_value("consent")) {
+				frappe.show_alert({ message: __("Please tick the confirmation checkbox first"), indicator: "orange" });
+				return;
+			}
+			d.hide();
+			if (use_it) frm.set_value("multi_currency_calculation", 1);
+		}
+		d.show();
+	}
+
 	frappe.ui.form.on("Purchase Invoice", {
 		refresh(frm) {
 			if (frm.doc.docstatus !== 0 || frm.doc.multi_currency_calculation || frm._mc_prompted === frm.doc.name) return;
 			frm._mc_prompted = frm.doc.name;
-			frappe.confirm(__("Do you want to use Multi Currency Calculation for this document?"), () =>
-				frm.set_value("multi_currency_calculation", 1)
-			);
+			ask_multi_currency(frm);
 		},
 	});
 })();

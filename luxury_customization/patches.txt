@@ -4,3 +4,5 @@
 
 [post_model_sync]
 # Patches added in this section will be executed after doctypes are migrated
+luxury_customization.patches.add_buying_currency_section
+luxury_customization.patches.hide_additional_net_total
