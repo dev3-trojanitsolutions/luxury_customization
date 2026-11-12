@@ -1,7 +1,7 @@
 import json
 
 import frappe
-from frappe.model.utils.user_settings import clear_user_settings_cache, sync_user_settings
+from frappe.model.utils.user_settings import sync_user_settings
 
 GRIDS = {
 	"Purchase Order": "Purchase Order Item",
@@ -28,7 +28,8 @@ def execute():
 				"update `__UserSettings` set data=%s where user=%s and doctype=%s",
 				(json.dumps(data), row.user, doctype),
 			)
-		clear_user_settings_cache(doctype)
+			# Drop the cached copy so the next load reads the updated row
+			frappe.cache.hdel("_user_settings", f"{doctype}::{row.user}")
 
 
 def add_columns(columns):
