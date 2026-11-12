@@ -151,17 +151,20 @@ doc_events = {
 	"Purchase Order": {
 		"before_validate": "luxury_customization.customizations.purchase_order.before_validate",
 		"validate": "luxury_customization.customizations.purchase_order.validate",
-		"before_update_after_submit": "luxury_customization.customizations.purchase_order.validate"
+		"before_update_after_submit": "luxury_customization.customizations.purchase_order.validate",
+		"on_submit": "luxury_customization.customizations.selling_price.on_submit"
 	},
 	"Purchase Receipt": {
 		"before_validate": "luxury_customization.customizations.purchase_receipt.before_validate",
 		"validate": "luxury_customization.customizations.purchase_receipt.validate",
-		"before_update_after_submit": "luxury_customization.customizations.purchase_receipt.validate"
+		"before_update_after_submit": "luxury_customization.customizations.purchase_receipt.validate",
+		"on_submit": "luxury_customization.customizations.selling_price.on_submit"
 	},
 	"Purchase Invoice": {
 		"before_validate": "luxury_customization.customizations.purchase_invoice.before_validate",
 		"validate": "luxury_customization.customizations.purchase_invoice.validate",
-		"before_update_after_submit": "luxury_customization.customizations.purchase_invoice.validate"
+		"before_update_after_submit": "luxury_customization.customizations.purchase_invoice.validate",
+		"on_submit": "luxury_customization.customizations.selling_price.on_submit"
 	},
 	"Supplier Quotation": {
 		"before_validate": "luxury_customization.customizations.supplier_quotation.before_validate",

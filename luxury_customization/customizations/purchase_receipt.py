@@ -3,6 +3,9 @@ from frappe import _
 from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 from erpnext.setup.utils import get_exchange_rate
 from frappe.utils import flt
+from luxury_customization.customizations.selling_price import (
+    SELLING_PRICE_FIELDS, SELLING_PRICE_FIELDNAMES, set_selling_prices,
+)
 
 # Display-only: reads the standard base_* (company currency) totals and never writes to them.
 CONVERTED_TOTALS = {
@@ -101,13 +104,14 @@ def create_custom_fields():
             {
                 "fieldname": "other_currency_rate",
                 "fieldtype": "Currency",
-                "label": "Other Currency Rate",
+                "label": "Buying Rate",
                 "options": "calculation_currency",
                 "insert_after": "rate",
                 "in_list_view": 1,
                 "depends_on": "eval:parent.multi_currency_calculation",
                 "description": "Item price in Calculation Currency",
             },
+            *SELLING_PRICE_FIELDS,
         ],
     }
 
@@ -125,7 +129,7 @@ def delete_custom_fields():
             "calculation_exchange_rate", "calculation_to_document_rate", "additional_currency_column", "additional_net_total",
             "additional_total", "additional_grand_total",
         ],
-        "Purchase Receipt Item": ["other_currency_rate"],
+        "Purchase Receipt Item": ["other_currency_rate", *SELLING_PRICE_FIELDNAMES],
     }
 
     for doctype, fields in custom_fields_to_delete.items():
@@ -200,6 +204,7 @@ def before_validate(doc, method=None):
     # Runs before ERPNext's own validate, so its normal Rate x Qty, tax and base_* logic takes over.
     copy_from_source(doc)
     copy_item_rates(doc)
+    set_selling_prices(doc)
     if not doc.multi_currency_calculation:
         return
 

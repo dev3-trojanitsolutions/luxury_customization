@@ -101,7 +101,7 @@ def create_custom_fields():
             {
                 "fieldname": "other_currency_rate",
                 "fieldtype": "Currency",
-                "label": "Other Currency Rate",
+                "label": "Buying Rate",
                 "options": "calculation_currency",
                 "insert_after": "rate",
                 "in_list_view": 1,

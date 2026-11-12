@@ -135,3 +135,87 @@
 		},
 	});
 })();
+
+// Multi-Currency Calculation on: show the Buying Rate column and make Rate read-only (set from Buying Rate)
+(() => {
+	const toggle_buying_rate = (frm) => {
+		const grid = frm.fields_dict.items && frm.fields_dict.items.grid;
+		if (!grid) return;
+		const on = frm.doc.multi_currency_calculation ? 1 : 0;
+		let changed = false;
+		for (const [fieldname, prop, value] of [
+			["other_currency_rate", "hidden", on ? 0 : 1],
+			["rate", "read_only", on],
+		]) {
+			const df = grid.docfields.find((d) => d.fieldname === fieldname);
+			if (!df || (df[prop] || 0) === value) continue;
+			// This form's copy of the docfield (not shared meta)
+			grid.update_docfield_property(fieldname, prop, value);
+			changed = true;
+		}
+		// reset_grid rebuilds the cached columns and row editors
+		if (changed) grid.reset_grid();
+	};
+
+	frappe.ui.form.on("Purchase Receipt", {
+		onload_post_render: toggle_buying_rate,
+		refresh: toggle_buying_rate,
+		multi_currency_calculation: toggle_buying_rate,
+	});
+})();
+
+(function () {
+	// Selling Price List per row (default: Selling Settings), Previous Selling Price from Item Price.
+	// Selling Price is left for the user; it is saved to Item Price on submit.
+	function default_selling_price_list(frm) {
+		if (!frm._default_selling_price_list) {
+			frm._default_selling_price_list = frappe.db.get_single_value("Selling Settings", "selling_price_list");
+		}
+		return frm._default_selling_price_list;
+	}
+
+	function fetch_previous_price(frm, cdt, cdn) {
+		const row = locals[cdt][cdn];
+		if (frm.doc.docstatus !== 0) return;
+		if (!row.item_code || !row.sell_price_list) {
+			frappe.model.set_value(cdt, cdn, "previous_selling_price", 0);
+			return;
+		}
+		frappe.call({
+			method: "luxury_customization.customizations.selling_price.get_selling_price",
+			args: { item_code: row.item_code, price_list: row.sell_price_list, uom: row.uom },
+			callback: (r) => frappe.model.set_value(cdt, cdn, "previous_selling_price", flt(r.message)),
+		});
+	}
+
+	frappe.ui.form.on("Purchase Receipt", {
+		setup(frm) {
+			frm.set_query("sell_price_list", "items", () => ({
+				filters: {
+					selling: 1,
+					enabled: 1,
+					...(frm.doc.company ? { currency: erpnext.get_currency(frm.doc.company) } : {}),
+				},
+			}));
+		},
+	});
+
+	frappe.ui.form.on("Purchase Receipt Item", {
+		async items_add(frm, cdt, cdn) {
+			const price_list = await default_selling_price_list(frm);
+			if (price_list && !locals[cdt][cdn].sell_price_list) {
+				frappe.model.set_value(cdt, cdn, "sell_price_list", price_list);
+			}
+		},
+		async item_code(frm, cdt, cdn) {
+			const row = locals[cdt][cdn];
+			if (!row.sell_price_list) {
+				const price_list = await default_selling_price_list(frm);
+				if (price_list) return frappe.model.set_value(cdt, cdn, "sell_price_list", price_list);
+			}
+			fetch_previous_price(frm, cdt, cdn);
+		},
+		sell_price_list: fetch_previous_price,
+		uom: fetch_previous_price,
+	});
+})();

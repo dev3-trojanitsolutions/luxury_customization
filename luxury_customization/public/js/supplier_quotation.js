@@ -135,3 +135,31 @@
 		},
 	});
 })();
+
+// Multi-Currency Calculation on: show the Buying Rate column and make Rate read-only (set from Buying Rate)
+(() => {
+	const toggle_buying_rate = (frm) => {
+		const grid = frm.fields_dict.items && frm.fields_dict.items.grid;
+		if (!grid) return;
+		const on = frm.doc.multi_currency_calculation ? 1 : 0;
+		let changed = false;
+		for (const [fieldname, prop, value] of [
+			["other_currency_rate", "hidden", on ? 0 : 1],
+			["rate", "read_only", on],
+		]) {
+			const df = grid.docfields.find((d) => d.fieldname === fieldname);
+			if (!df || (df[prop] || 0) === value) continue;
+			// This form's copy of the docfield (not shared meta)
+			grid.update_docfield_property(fieldname, prop, value);
+			changed = true;
+		}
+		// reset_grid rebuilds the cached columns and row editors
+		if (changed) grid.reset_grid();
+	};
+
+	frappe.ui.form.on("Supplier Quotation", {
+		onload_post_render: toggle_buying_rate,
+		refresh: toggle_buying_rate,
+		multi_currency_calculation: toggle_buying_rate,
+	});
+})();
