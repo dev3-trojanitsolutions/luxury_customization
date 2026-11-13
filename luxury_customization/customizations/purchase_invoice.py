@@ -3,6 +3,7 @@ from frappe import _
 from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 from erpnext.setup.utils import get_exchange_rate
 from frappe.utils import flt
+from luxury_customization.customizations.uom_hierarchy import apply_to_items as apply_uom_hierarchy
 from luxury_customization.customizations.selling_price import (
     SELLING_PRICE_FIELDS, SELLING_PRICE_FIELDNAMES, set_selling_prices,
 )
@@ -204,6 +205,7 @@ def fetch_document_rate(doc):
 
 def before_validate(doc, method=None):
     # Runs before ERPNext's own validate, so its normal Rate x Qty, tax and base_* logic takes over.
+    apply_uom_hierarchy(doc)  # first, so rate and selling price logic see the final UOM
     copy_from_source(doc)
     copy_item_rates(doc)
     set_selling_prices(doc)

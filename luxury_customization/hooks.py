@@ -47,10 +47,10 @@ after_uninstall = "luxury_customization.uninstall.after_uninstall"
 # include js in doctype views
 doctype_js = {
 	"Company": "public/js/company.js",
-	"Purchase Order": "public/js/purchase_order.js",
-	"Purchase Receipt": "public/js/purchase_receipt.js",
-	"Purchase Invoice": "public/js/purchase_invoice.js",
-	"Supplier Quotation": "public/js/supplier_quotation.js",
+	"Purchase Order": ["public/js/uom_hierarchy.js", "public/js/purchase_order.js"],
+	"Purchase Receipt": ["public/js/uom_hierarchy.js", "public/js/purchase_receipt.js"],
+	"Purchase Invoice": ["public/js/uom_hierarchy.js", "public/js/purchase_invoice.js"],
+	"Supplier Quotation": ["public/js/uom_hierarchy.js", "public/js/supplier_quotation.js"],
 	"Material Request": "public/js/material_request.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
@@ -152,24 +152,34 @@ doc_events = {
 		"before_validate": "luxury_customization.customizations.purchase_order.before_validate",
 		"validate": "luxury_customization.customizations.purchase_order.validate",
 		"before_update_after_submit": "luxury_customization.customizations.purchase_order.validate",
-		"on_submit": "luxury_customization.customizations.selling_price.on_submit"
+		"on_submit": [
+			"luxury_customization.customizations.selling_price.on_submit",
+			"luxury_customization.customizations.uom_hierarchy.on_submit",
+		],
 	},
 	"Purchase Receipt": {
 		"before_validate": "luxury_customization.customizations.purchase_receipt.before_validate",
 		"validate": "luxury_customization.customizations.purchase_receipt.validate",
 		"before_update_after_submit": "luxury_customization.customizations.purchase_receipt.validate",
-		"on_submit": "luxury_customization.customizations.selling_price.on_submit"
+		"on_submit": [
+			"luxury_customization.customizations.selling_price.on_submit",
+			"luxury_customization.customizations.uom_hierarchy.on_submit",
+		],
 	},
 	"Purchase Invoice": {
 		"before_validate": "luxury_customization.customizations.purchase_invoice.before_validate",
 		"validate": "luxury_customization.customizations.purchase_invoice.validate",
 		"before_update_after_submit": "luxury_customization.customizations.purchase_invoice.validate",
-		"on_submit": "luxury_customization.customizations.selling_price.on_submit"
+		"on_submit": [
+			"luxury_customization.customizations.selling_price.on_submit",
+			"luxury_customization.customizations.uom_hierarchy.on_submit",
+		],
 	},
 	"Supplier Quotation": {
 		"before_validate": "luxury_customization.customizations.supplier_quotation.before_validate",
 		"validate": "luxury_customization.customizations.supplier_quotation.validate",
-		"before_update_after_submit": "luxury_customization.customizations.supplier_quotation.validate"
+		"before_update_after_submit": "luxury_customization.customizations.supplier_quotation.validate",
+		"on_submit": "luxury_customization.customizations.uom_hierarchy.on_submit",
 	},
 	"Employee Checkin": {
 		"before_insert": "luxury_customization.customizations.employee_checkin.set_check_in_time",

@@ -7,7 +7,8 @@ from luxury_customization.customizations import (
 	purchase_receipt,
 	rate_precision,
 	supplier_quotation,
-	item_price
+	item_price,
+	uom_hierarchy,
 )
 
 CUSTOM_FIELD_MODULES = [
@@ -18,7 +19,8 @@ CUSTOM_FIELD_MODULES = [
 	purchase_receipt,
 	purchase_invoice,
 	supplier_quotation,
-	item_price
+	item_price,
+	uom_hierarchy,
 ]
 
 
