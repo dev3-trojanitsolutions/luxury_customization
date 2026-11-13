@@ -53,6 +53,12 @@ doctype_js = {
 	"Supplier Quotation": ["public/js/uom_hierarchy.js", "public/js/supplier_quotation.js"],
 	"Material Request": "public/js/material_request.js",
 }
+
+fixtures = [
+    {
+        "dt": "Inventory Dimension"
+    }
+]
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}

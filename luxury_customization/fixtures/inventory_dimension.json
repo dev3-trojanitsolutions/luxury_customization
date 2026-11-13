@@ -1,0 +1,40 @@
+[
+ {
+  "apply_to_all_doctypes": 1,
+  "condition": null,
+  "dimension_name": "Rack",
+  "docstatus": 0,
+  "doctype": "Inventory Dimension",
+  "document_type": null,
+  "fetch_from_parent": "Rack",
+  "istable": 0,
+  "mandatory_depends_on_backend": null,
+  "modified": "2026-11-13 11:12:52.257114",
+  "name": "Rack",
+  "reference_document": "Rack",
+  "reqd": 1,
+  "source_fieldname": "rack",
+  "target_fieldname": "rack",
+  "type_of_transaction": "Both",
+  "validate_negative_stock": 0
+ },
+ {
+  "apply_to_all_doctypes": 1,
+  "condition": null,
+  "dimension_name": "Shelf",
+  "docstatus": 0,
+  "doctype": "Inventory Dimension",
+  "document_type": null,
+  "fetch_from_parent": "Shelves",
+  "istable": 0,
+  "mandatory_depends_on_backend": null,
+  "modified": "2026-11-13 11:13:16.353743",
+  "name": "Shelf",
+  "reference_document": "Shelves",
+  "reqd": 1,
+  "source_fieldname": "shelf",
+  "target_fieldname": "shelf",
+  "type_of_transaction": "Both",
+  "validate_negative_stock": 0
+ }
+]
